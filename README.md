@@ -1,44 +1,24 @@
-# ERP Financeiro com Streamlit
+ERP Financier avec Streamlit
+Il s'agit d'une simulation d’un système ERP financier simple, développé avec Streamlit et SQLite, pour la gestion des clients, des factures à payer, des factures à recevoir et des écritures financières.
 
-Este é uma simulaçaõ de um sistema **ERP Financeiro** simples, desenvolvido com **Streamlit** e **SQLite**, para gerenciamento de clientes, contas a pagar, contas a receber e lançamentos financeiros.
+ Fonctionnalités
+ Gestion des clients : gérez vos clients avec leur nom, e-mail et téléphone.
 
-## 📌 Funcionalidades
-- 📋 **Cadastro de Clientes**: Gerencie seus clientes com nome, e-mail e telefone.
-- 💰 **Contas a Pagar**: Controle suas despesas e pagamentos.
-- 📥 **Contas a Receber**: Acompanhe os valores a receber de clientes.
-- 📊 **Lançamentos Financeiros**: Registre receitas e despesas.
-- 📈 **Relatórios**: Visualize fluxos de caixa e outras métricas financeiras.
+ Factures à payer : suivez vos dépenses et paiements.
 
-## 🛠️ Tecnologias Utilizadas
-- **Python**
-- **Streamlit** (para interface gráfica)
-- **SQLite** (banco de dados)
-- **Faker** (geração de dados fictícios)
-- **Pandas** (manipulação de dados)
+ Factures à recevoir : suivez les montants à recevoir de vos clients.
 
-## 🚀 Como Executar o Projeto
+ Écritures financières : enregistrez les recettes et les dépenses.
 
-###  Clone o repositório:
-```bash
-git clone https://github.com/seu-usuario/erp-financeiro.git
-cd erp-financeiro
-```
+ Rapports : visualisez les flux de trésorerie et d’autres indicateurs financiers.
 
-###  Crie um ambiente virtual e instale as dependências:
-```bash
-python -m venv venv
-source venv/bin/activate  # Para Linux/Mac
-venv\Scripts\activate  # Para Windows
-pip install -r requirements.txt
-```
+ Technologies utilisées
+Python
 
-###  Execute a carga do banco de dados:
-```bash
-python database_finance.py
-```
+Streamlit (pour l’interface utilisateur)
 
+SQLite (base de données)
 
-### Execute a aplicação:
-```bash
-streamlit run app.py
-```
+Faker (génération de données fictives)
+
+Pandas (manipulation et analyse de données)
