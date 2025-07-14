@@ -6,97 +6,98 @@ import matplotlib.pyplot as plt
 
 # Interface Streamlit
 def main():
-    st.title("ERP Financeiro com Streamlit")
+    st.title("ERP Financier avec Streamlit")
     
-    menu = ["Clientes", "Contas a Pagar", "Contas a Receber", "Lançamentos", "Relatórios", "Fluxo de Caixa"]
-    choice = st.sidebar.selectbox("Selecione uma opção", menu)
+    menu = ["Clients", "Factures à Payer", "Factures à Recevoir", "Écritures", "Rapports", "Flux de Trésorerie"]
+    choice = st.sidebar.selectbox("Sélectionnez une option", menu)
     conn = sqlite3.connect("erp_finance.db", detect_types=sqlite3.PARSE_DECLTYPES)
     cursor = conn.cursor()
     
-    if choice == "Clientes":
-        st.subheader("Cadastro de Clientes")
+    if choice == "Clients":
+        st.subheader("Enregistrement des Clients")
         df = pd.read_sql_query("SELECT * FROM clientes", conn)
         st.dataframe(df)
         
-    elif choice == "Contas a Pagar":
-        st.subheader("Contas a Pagar")
+    elif choice == "Factures à Payer":
+        st.subheader("Factures à Payer")
         df = pd.read_sql_query("SELECT * FROM contas_pagar", conn)
         st.dataframe(df)
         
-    elif choice == "Contas a Receber":
-        st.subheader("Contas a Receber")
+    elif choice == "Factures à Recevoir":
+        st.subheader("Factures à Recevoir")
         df = pd.read_sql_query("SELECT * FROM contas_receber", conn)
         st.dataframe(df)
         
-    elif choice == "Lançamentos":
-        st.subheader("Lançamentos Financeiros")
+    elif choice == "Écritures":
+        st.subheader("Écritures Financières")
         df = pd.read_sql_query("SELECT * FROM lancamentos", conn)
         st.dataframe(df)
         
-    elif choice == "Relatórios":
-        st.subheader("Relatório de Fluxo de Caixa")
+    elif choice == "Rapports":
+        st.subheader("Rapport de Flux de Trésorerie")
         df = pd.read_sql_query("SELECT tipo, SUM(valor) as total FROM lancamentos GROUP BY tipo", conn)
         st.dataframe(df)
         
-        # Criar gráfico de fluxo de caixa
+        # Graphique de flux de trésorerie
         if not df.empty:
             fig, ax = plt.subplots(figsize=(6, 4))
-            tipos = df["tipo"].tolist()
-            totais = df["total"].tolist()
-            cores = ["green" if tipo.lower() == "receita" else "red" for tipo in tipos]
+            types = df["tipo"].tolist()
+            totaux = df["total"].tolist()
+            couleurs = ["green" if t.lower() == "receita" else "red" for t in types]
             
-            ax.bar(tipos, totais, color=cores)
-            ax.set_title("Relatório de Fluxo de Caixa")
-            ax.set_ylabel("Total (R$)")
+            ax.bar(types, totaux, color=couleurs)
+            ax.set_title("Rapport de Flux de Trésorerie")
+            ax.set_ylabel("Total (€)")
             
-            for i, total in enumerate(totais):
-                ax.text(i, total + 2000, f"R$ {total:,.2f}", ha="center", fontsize=12)
+            for i, total in enumerate(totaux):
+                ax.text(i, total + 2000, f"€ {total:,.2f}", ha="center", fontsize=12)
             
             st.pyplot(fig)
         else:
-            st.write("Nenhum dado disponível para exibição.")
+            st.write("Aucune donnée disponible à afficher.")
         
-        # Criar gráfico de distribuição das contas a pagar por fornecedor
-        st.subheader("Distribuição das Contas a Pagar por Fornecedor")
-        df_fornecedores = pd.read_sql_query("SELECT fornecedor, SUM(valor) as total FROM contas_pagar GROUP BY fornecedor ORDER BY total DESC LIMIT 4", conn)
+        # Graphique de distribution des factures à payer par fournisseur
+        st.subheader("Répartition des Factures à Payer par Fournisseur")
+        df_fournisseurs = pd.read_sql_query(
+            "SELECT fornecedor, SUM(valor) as total FROM contas_pagar GROUP BY fornecedor ORDER BY total DESC LIMIT 4", conn)
         
-        if not df_fornecedores.empty:
+        if not df_fournisseurs.empty:
             fig, ax = plt.subplots(figsize=(6, 4))
-            ax.pie(df_fornecedores["total"], labels=df_fornecedores["fornecedor"], autopct='%1.1f%%', startangle=140)
-            ax.set_title("Distribuição das Contas a Pagar (Top 4 Fornecedores)")
+            ax.pie(df_fournisseurs["total"], labels=df_fournisseurs["fornecedor"], autopct='%1.1f%%', startangle=140)
+            ax.set_title("Répartition des Factures à Payer (Top 4 Fournisseurs)")
             st.pyplot(fig)
         else:
-            st.write("Nenhum dado disponível para exibição.")
+            st.write("Aucune donnée disponible à afficher.")
         
-        # Criar gráfico de status das contas a pagar e a receber
-        st.subheader("Status das Contas a Pagar e Receber")
-        df_status_pagar = pd.read_sql_query("SELECT status, SUM(valor) as total FROM contas_pagar GROUP BY status", conn)
-        df_status_receber = pd.read_sql_query("SELECT status, SUM(valor) as total FROM contas_receber GROUP BY status", conn)
+        # Graphique du statut des factures à payer et à recevoir
+        st.subheader("Statut des Factures à Payer et à Recevoir")
+        df_statut_payer = pd.read_sql_query("SELECT status, SUM(valor) as total FROM contas_pagar GROUP BY status", conn)
+        df_statut_recevoir = pd.read_sql_query("SELECT status, SUM(valor) as total FROM contas_receber GROUP BY status", conn)
         
-        if not df_status_pagar.empty and not df_status_receber.empty:
+        if not df_statut_payer.empty and not df_statut_recevoir.empty:
             fig, ax = plt.subplots(figsize=(6, 4))
-            status_labels = ["Pendentes", "Pagas/Recebidas"]
-            valores_pagar = [
-                df_status_pagar[df_status_pagar["status"] == "Pendente"]["total"].sum(),
-                df_status_pagar[df_status_pagar["status"] == "Pago"]["total"].sum()
+            labels_statut = ["En attente", "Payées/Reçues"]
+            valeurs_payer = [
+                df_statut_payer[df_statut_payer["status"] == "Pendente"]["total"].sum(),
+                df_statut_payer[df_statut_payer["status"] == "Pago"]["total"].sum()
             ]
-            valores_receber = [
-                df_status_receber[df_status_receber["status"] == "Pendente"]["total"].sum(),
-                df_status_receber[df_status_receber["status"] == "Recebido"]["total"].sum()
+            valeurs_recevoir = [
+                df_statut_recevoir[df_statut_recevoir["status"] == "Pendente"]["total"].sum(),
+                df_statut_recevoir[df_statut_recevoir["status"] == "Recebido"]["total"].sum()
             ]
             
-            ax.bar(status_labels, valores_pagar, label="Contas a Pagar", alpha=0.7, color="red")
-            ax.bar(status_labels, valores_receber, label="Contas a Receber", alpha=0.7, color="green", bottom=valores_pagar)
-            ax.set_title("Status das Contas a Pagar e Receber")
-            ax.set_ylabel("Total (R$)")
+            ax.bar(labels_statut, valeurs_payer, label="À Payer", alpha=0.7, color="red")
+            ax.bar(labels_statut, valeurs_recevoir, label="À Recevoir", alpha=0.7, color="green", bottom=valeurs_payer)
+            ax.set_title("Statut des Factures à Payer et à Recevoir")
+            ax.set_ylabel("Total (€)")
             ax.legend()
             st.pyplot(fig)
         else:
-            st.write("Nenhum dado disponível para exibição.")
+            st.write("Aucune donnée disponible à afficher.")
         
-        # Criar gráfico dos Top 5 Clientes com Maior Receita
-        st.subheader("Top 5 Clientes com Maior Receita")
-        df_top_clientes = pd.read_sql_query("""
+        # Top 5 clients avec le plus de revenus
+        st.subheader("Top 5 Clients avec le Plus de Revenus")
+        df_top_clients = pd.read_sql_query("""
             SELECT c.nome, SUM(cr.valor) as total 
             FROM contas_receber cr 
             JOIN clientes c ON cr.cliente_id = c.id 
@@ -105,53 +106,55 @@ def main():
             ORDER BY total DESC 
             LIMIT 5""", conn)
         
-        if not df_top_clientes.empty:
-            st.dataframe(df_top_clientes)
+        if not df_top_clients.empty:
+            st.dataframe(df_top_clients)
             fig, ax = plt.subplots(figsize=(6, 4))
-            ax.bar(df_top_clientes["nome"], df_top_clientes["total"], color="blue")
-            ax.set_title("Top 5 Clientes com Maior Receita")
-            ax.set_ylabel("Total (R$)")
+            ax.bar(df_top_clients["nome"], df_top_clients["total"], color="blue")
+            ax.set_title("Top 5 Clients avec le Plus de Revenus")
+            ax.set_ylabel("Total (€)")
             plt.xticks(rotation=45)
             st.pyplot(fig)
         else:
-            st.write("Nenhum dado disponível para exibição.")
-
-                # Criar gráfico de comparação entre receita e despesa do mês atual
-        st.subheader("Comparação Receita vs Despesa - Mês Atual")
-        df_comparacao = pd.read_sql_query("""
+            st.write("Aucune donnée disponible à afficher.")
+        
+        # Comparaison recette vs dépense du mois actuel
+        st.subheader("Comparaison Recette vs Dépense - Mois en cours")
+        df_comparaison = pd.read_sql_query("""
             SELECT tipo, SUM(valor) as total 
             FROM lancamentos 
             WHERE strftime('%Y-%m', data) = strftime('%Y-%m', 'now')
             GROUP BY tipo""", conn)
         
-        if not df_comparacao.empty:
+        if not df_comparaison.empty:
             fig, ax = plt.subplots(figsize=(6, 4))
-            ax.bar(df_comparacao["tipo"], df_comparacao["total"], color=["green" if tipo == "Receita" else "red" for tipo in df_comparacao["tipo"]])
-            ax.set_title("Receita vs Despesa - Mês Atual")
-            ax.set_ylabel("Total (R$)")
+            couleurs = ["green" if t == "Receita" else "red" for t in df_comparaison["tipo"]]
+            ax.bar(df_comparaison["tipo"], df_comparaison["total"], color=couleurs)
+            ax.set_title("Recette vs Dépense - Mois en cours")
+            ax.set_ylabel("Total (€)")
             st.pyplot(fig)
         else:
-            st.write("Nenhum dado disponível para exibição.")
+            st.write("Aucune donnée disponible à afficher.")
         
-        # Criar gráfico de previsão de fluxo de caixa
-        st.subheader("Previsão de Fluxo de Caixa (Próximos 30 Dias)")
-        df_previsao = pd.read_sql_query("""
-            SELECT 'Contas a Pagar' as tipo, SUM(valor) as total 
+        # Prévision du flux de trésorerie à 30 jours
+        st.subheader("Prévision de Trésorerie (Prochains 30 Jours)")
+        df_prevision = pd.read_sql_query("""
+            SELECT 'Factures à Payer' as tipo, SUM(valor) as total 
             FROM contas_pagar 
             WHERE vencimento BETWEEN date('now') AND date('now', '+30 days')
             UNION ALL
-            SELECT 'Contas a Receber' as tipo, SUM(valor) as total 
+            SELECT 'Factures à Recevoir' as tipo, SUM(valor) as total 
             FROM contas_receber 
             WHERE vencimento BETWEEN date('now') AND date('now', '+30 days')""", conn)
         
-        if not df_previsao.empty:
+        if not df_prevision.empty:
             fig, ax = plt.subplots(figsize=(6, 4))
-            ax.bar(df_previsao["tipo"], df_previsao["total"], color=["red" if tipo == "Contas a Pagar" else "green" for tipo in df_previsao["tipo"]])
-            ax.set_title("Previsão de Fluxo de Caixa - Próximos 30 Dias")
-            ax.set_ylabel("Total (R$)")
+            couleurs = ["red" if t == "Factures à Payer" else "green" for t in df_prevision["tipo"]]
+            ax.bar(df_prevision["tipo"], df_prevision["total"], color=couleurs)
+            ax.set_title("Prévision de Trésorerie - Prochains 30 Jours")
+            ax.set_ylabel("Total (€)")
             st.pyplot(fig)
         else:
-            st.write("Nenhum dado disponível para exibição.")
+            st.write("Aucune donnée disponible à afficher.")
 
 if __name__ == "__main__":
     main()
